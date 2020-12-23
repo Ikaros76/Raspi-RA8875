@@ -1,5 +1,7 @@
+#include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "RA8875.h"
 #include "RA8875Register.h"
@@ -9,13 +11,17 @@ displaySpiBegin();
 displayBegin();
 displayOn(true);
 textMode();
+textEnlarge(0);
 setTextColor(RA8875_WHITE, RA8875_BLACK);
 setTextCursor(0,0);
 textWrite("RA8875 Demo");
-setTextColor(RA8875_BLACK, RA8875_WHITE);
+textEnlarge(1);
 setTextCursor(0,30);
 textWrite("RA8875 Demo");
-setTextCursor(0,60);
 textEnlarge(2);
+setTextCursor(0,90);
+textWrite("RA8875 Demo");
+textEnlarge(3);
+setTextCursor(0,160);
 textWrite("RA8875 Demo");
 }

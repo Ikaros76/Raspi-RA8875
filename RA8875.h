@@ -11,3 +11,5 @@ void textEnlarge(uint8_t scale);
 void setTextCursor(uint16_t x, uint16_t y);
 void setTextColor(uint16_t foreColor, uint16_t bgColor);
 void drawPixel(int16_t x, int16_t y, uint16_t color);
+
+

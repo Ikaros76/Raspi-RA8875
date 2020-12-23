@@ -15,13 +15,16 @@ displaySpiBegin();
 displayBegin();
 displayOn(true);
 textMode();
-for(;;){
-int x = (rand() % 800)+1;
-int y = (rand() % 480)+1;
-int c = (rand() % 255)+1;
-int color = (rand() % 0xFFFF)+1;
-setTextCursor(x,y);
-setTextColor(0x0000, color);
+setTextColor(RA8875_WHITE,RA8875_BLACK);
+setTextCursor(0,0);
+for(int c = 0;c<256; c++){
 writeCommand(RA8875_MRWC);
 writeData(c);
-}}
+}
+textEnlarge(1);
+for(int c = 0; c < 256; c++) {
+writeCommand(RA8875_MRWC);
+writeData(c);
+}
+
+}

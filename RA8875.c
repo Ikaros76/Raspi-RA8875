@@ -15,6 +15,13 @@
 #define RES	2
 #define CS	3
 
+#define bitRead(value, bit) (((value) >> (bit)) & 0x01)
+#define bitSet(value, bit) ((value) |= (1UL << (bit))
+#define bitClear(value, bit) ((value) &= ~(1UL << (bit)))
+#define bitWrite(value, bit, bitvalue) (bitvalue ? bitSet(value, bit) : bitClear(value, bit))
+
+uint8_t _scale = 0;
+
 void displaySpiBegin(void)
 {
 if (bcm2835_init() == -1) {
@@ -65,8 +72,10 @@ writeData(val);
 void textWrite(const char *buffer)
 {
 uint16_t len = strlen(buffer);
-writeCommand(RA8875_MRWC);
+//writeCommand(RA8875_MRWC);
 for (uint16_t i = 0; i < len; i++) {
+textEnlarge(_scale);
+writeCommand(RA8875_MRWC);
 writeData(buffer[i]);
 }
 }
@@ -161,6 +170,7 @@ temp |= scale << 2;
 temp |= scale;
 writeCommand(0x22);
 writeData(temp);
+_scale = scale;
 }
 
 void setTextColor(uint16_t foreColor, uint16_t bgColor)
