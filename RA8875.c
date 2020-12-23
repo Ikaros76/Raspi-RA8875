@@ -24,7 +24,7 @@ if (bcm2835_init() == -1) {
 bcm2835_spi_begin();
 bcm2835_spi_setBitOrder(BCM2835_SPI_BIT_ORDER_MSBFIRST);
 bcm2835_spi_setDataMode(BCM2835_SPI_MODE0);
-bcm2835_spi_setClockDivider(BCM2835_SPI_CLOCK_DIVIDER_32);
+bcm2835_spi_setClockDivider(BCM2835_SPI_CLOCK_DIVIDER_64);
 bcm2835_spi_chipSelect(BCM2835_SPI_CS0);
 bcm2835_spi_setChipSelectPolarity(BCM2835_SPI_CS0, LOW);
 bcm2835_gpio_fsel(CS,BCM2835_GPIO_FSEL_OUTP);
@@ -118,9 +118,9 @@ writeReg(RA8875_VEAW1, (uint16_t)(480 - 1 + 0) >> 8);
 
 writeReg(RA8875_MCLR, RA8875_MCLR_START | RA8875_MCLR_FULL);
 delay(500);
+}
 
-// Set text mode
-
+void textMode(void) {
 writeCommand(RA8875_MWCR0);
 uint8_t temp = readData();
 temp |= RA8875_MWCR0_TXTMODE;
@@ -159,6 +159,7 @@ uint8_t temp = readData();
 temp &= ~(0xF);
 temp |= scale << 2;
 temp |= scale;
+writeCommand(0x22);
 writeData(temp);
 }
 
@@ -185,4 +186,17 @@ writeCommand(0x22);
 uint8_t temp = readData();
 temp &= ~(1 << 6);
 writeData(temp);
+}
+
+void drawPixel(int16_t x, int16_t y, uint16_t color) {
+writeReg(RA8875_CURH0, x);
+writeReg(RA8875_CURH1, x >> 8);
+writeReg(RA8875_CURV0, y);
+writeReg(RA8875_CURV1, y >> 8);
+writeCommand(RA8875_MRWC);
+bcm2835_gpio_write(CS, LOW);
+bcm2835_spi_transfer(RA8875_DATAWRITE);
+bcm2835_spi_transfer(color >> 8);
+bcm2835_spi_transfer(color);
+bcm2835_gpio_write(CS, HIGH);
 }

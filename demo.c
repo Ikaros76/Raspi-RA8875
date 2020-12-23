@@ -14,6 +14,7 @@ int main(void)
 displaySpiBegin();
 displayBegin();
 displayOn(true);
+textMode();
 textEnlarge(3);
 for(;;){
 int x = (rand() % 800)+1;
