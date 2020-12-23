@@ -22,6 +22,13 @@
 
 uint8_t _scale = 0;
 
+unsigned long millis(void)
+{
+struct timespec ts;
+clock_gettime(CLOCK_MONOTONIC, &ts);
+return ( ts.tv_sec * 1000 + ts.tv_nsec / 1000000L );
+}
+
 void displaySpiBegin(void)
 {
 if (bcm2835_init() == -1) {
@@ -69,6 +76,19 @@ writeCommand(reg);
 writeData(val);
 }
 
+void waitBusy(uint8_t res) {
+uint8_t temp;
+unsigned long start = millis();
+do {
+  if (res == 0x01) writeCommand(RA8875_DMACR);
+  bcm2835_gpio_write(CS, LOW);
+  bcm2835_spi_transfer(RA8875_CMDREAD);
+  temp = bcm2835_spi_transfer(0x0);
+  bcm2835_gpio_write(CS, HIGH);
+  if ((millis() - start) > 10) return;
+} while ((temp & res) == res);
+}
+
 void textWrite(const char *buffer)
 {
 uint16_t len = strlen(buffer);
@@ -77,6 +97,7 @@ for (uint16_t i = 0; i < len; i++) {
 textEnlarge(_scale);
 writeCommand(RA8875_MRWC);
 writeData(buffer[i]);
+waitBusy(0x80);
 }
 }
 
@@ -209,4 +230,22 @@ bcm2835_spi_transfer(RA8875_DATAWRITE);
 bcm2835_spi_transfer(color >> 8);
 bcm2835_spi_transfer(color);
 bcm2835_gpio_write(CS, HIGH);
+}
+
+void clearMemory(bool stop) {
+uint8_t temp;
+writeCommand(RA8875_MCLR);
+if (stop) temp &= ~(1 << 7);
+  else temp |= (1 << 7);
+writeData(temp);
+waitBusy(0x80);
+}
+
+void clearActiveWindow(bool full) {
+uint8_t temp;
+writeCommand(RA8875_MCLR);
+temp = readData();
+if (full == true) temp &= ~(1 << 6);
+  else temp |= (1 << 6);
+writeData(temp);
 }

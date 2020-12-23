@@ -214,3 +214,5 @@
 #define RA8875_SCROLL_LAYER1 0x40 ///< See datasheet
 #define RA8875_SCROLL_LAYER2 0x80 ///< See datasheet
 #define RA8875_SCROLL_BUFFER 0xC0 ///< See datasheet
+
+#define RA8875_DMACR 0xBF
