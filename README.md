@@ -7,5 +7,4 @@ In creation ...
 for the moment the library is for a display of 800x480
 
 gcc -o demo demo.c RA8875.c -lbcm2835
-gcc -o ascii ascii.c RA8875.c -lbcm2835
-etc...
+
