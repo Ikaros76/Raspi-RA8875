@@ -1,3 +1,7 @@
+class raspiRA8875 {
+public:
+raspiRA8875(void);
+unsigned long millis(void);
 void displaySpiBegin(void);
 void displayBegin(void);
 void displayOn(bool on);
@@ -15,3 +19,9 @@ void drawPixel(int16_t x, int16_t y, uint16_t color);
 
 void clearMemory(bool stop);
 void clearActiveWindow(bool full);
+
+private:
+ uint8_t  _scale = 0;
+ bool     _textMode = false;
+
+};
