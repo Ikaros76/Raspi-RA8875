@@ -19,9 +19,18 @@
 #define bitSet(value, bit) ((value) |= (1UL << (bit))
 #define bitClear(value, bit) ((value) &= ~(1UL << (bit)))
 #define bitWrite(value, bit, bitvalue) (bitvalue ? bitSet(value, bit) : bitClear(value, bit))
+#define pgm_read_byte(addr) (*(const unsigned char *)(addr))
+#define pgm_read_word(addr) (*(const unsigned short *)(addr))
+#define pgm_read_dword(addr) (*(const unsigned long *)(addr))
+#define pgm_read_pointer(addr) ((void *)pgm_read_dword(addr))
 
-uint8_t _scale = 0;
-bool 	_textMode = false;
+inline GFXglyph *pgm_read_glyph_ptr(const GFXfont *gfxFont, uint8_t c){
+  return gfxFont->glyph+c;
+}
+
+inline uint8_t *pgm_read_bitmap_ptr(const GFXfont *gfxFont) {
+return gfxFont->bitmap;
+}
 
 raspiRA8875::raspiRA8875(void) {
 }
@@ -246,4 +255,36 @@ temp = readData();
 if (full == true) temp &= ~(1 << 6);
   else temp |= (1 << 6);
 writeData(temp);
+}
+
+void raspiRA8875::setFontGFX(const GFXfont *f) {
+gfxFont = (GFXfont *)f;
+}
+
+void raspiRA8875::drawCharGFX(int16_t x, int16_t y, const char *c, uint16_t color, uint8_t size) {
+for(uint16_t t=0;t<= strlen(c)-1; t++) {
+  uint8_t z = c[t] - (uint8_t)pgm_read_byte(&gfxFont->first);
+  GFXglyph *glyph =  pgm_read_glyph_ptr(gfxFont,z);
+  uint8_t *bitmap = pgm_read_bitmap_ptr(gfxFont);
+  uint16_t bo = pgm_read_word(&glyph->bitmapOffset);
+  uint8_t  w  = pgm_read_byte(&glyph->width);
+  uint8_t  h  = pgm_read_byte(&glyph->height);
+  int8_t   xo = pgm_read_byte(&glyph->xOffset);
+  int8_t   yo = pgm_read_byte(&glyph->yOffset);
+  uint8_t  av = pgm_read_byte(&glyph->xAdvance);
+  uint16_t xx, yy, bits = 0,bit = 0;
+  int16_t  xo16 = 0, yo16 = 0;
+	for(yy=0; yy<h; yy++) {
+	for(xx=0; xx<w; xx++) {
+	  if(!(bit++ & 7)) {
+	    bits = pgm_read_byte(&bitmap[bo++]);
+	    }
+	  if(bits & 0x80) {
+	    if(size==1) drawPixel(x+xo+xx, y+yo+yy, color);
+	    }
+          bits <<= 1;
+       }
+     }
+     x=x+(av*size);
+}
 }

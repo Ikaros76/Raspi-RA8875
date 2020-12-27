@@ -1,5 +1,26 @@
+
+
+typedef struct {
+  uint16_t	bitmapOffset;
+  uint8_t	width;
+  uint8_t	height;
+  uint8_t	xAdvance;
+  int8_t	xOffset;
+  int8_t	yOffset;
+} GFXglyph;
+
+typedef struct {
+  uint8_t	*bitmap;
+  GFXglyph	*glyph;
+  uint8_t	first;
+  uint8_t	last;
+  uint8_t	yAdvance;
+} GFXfont;
+
 class raspiRA8875 {
+
 public:
+
 raspiRA8875(void);
 unsigned long millis(void);
 void displaySpiBegin(void);
@@ -20,8 +41,12 @@ void drawPixel(int16_t x, int16_t y, uint16_t color);
 void clearMemory(bool stop);
 void clearActiveWindow(bool full);
 
-private:
- uint8_t  _scale = 0;
- bool     _textMode = false;
+void setFontGFX(const GFXfont *f = NULL);
+void drawCharGFX(int16_t x, int16_t y, const char *c, uint16_t color, uint8_t size);
 
+private:
+  uint8_t  _scale = 0;
+  bool     _textMode = false;
+
+  GFXfont  *gfxFont;
 };
