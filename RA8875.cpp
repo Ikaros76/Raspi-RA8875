@@ -109,6 +109,7 @@ waitBusy(0x80);
 }
 
 void raspiRA8875::displayBegin(void) {
+displaySpiBegin();
 bcm2835_gpio_fsel(CS, BCM2835_GPIO_FSEL_OUTP);
 bcm2835_gpio_fsel(RES, BCM2835_GPIO_FSEL_OUTP);
 bcm2835_gpio_write(CS, HIGH);

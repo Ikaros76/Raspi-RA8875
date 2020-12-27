@@ -5,25 +5,16 @@
 
 #include "RA8875.h"
 #include "RA8875Register.h"
+#include "Fonts/FreeSans24pt7b.h"
+#include "Fonts/comic60pt7b.h"
 
 raspiRA8875 tft = raspiRA8875();
 
 int main(void) {
-tft.displaySpiBegin();
 tft.displayBegin();
 tft.displayOn(true);
-tft.textMode();
-tft.textEnlarge(0);
-tft.setTextColor(RA8875_WHITE, RA8875_BLACK);
-tft.setTextCursor(0,0);
-tft.textWrite("RA8875 Demo");
-tft.textEnlarge(1);
-tft.setTextCursor(0,30);
-tft.textWrite("RA8875 Demo");
-tft.textEnlarge(2);
-tft.setTextCursor(0,90);
-tft.textWrite("RA8875 Demo");
-tft.textEnlarge(3);
-tft.setTextCursor(0,160);
-tft.textWrite("RA8875 Demo");
+tft.setFontGFX(&FreeSans24pt7b);
+tft.drawCharGFX(0,40,"RA8875 Raspberry PI",RA8875_GREEN,1);
+tft.setFontGFX(&comic60pt7b);
+tft.drawCharGFX(0,160,"Raspberry PI",RA8875_MAGENTA,1);
 }
