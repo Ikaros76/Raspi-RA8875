@@ -24,7 +24,7 @@ for (;;){
 uint16_t x = (rand() % 800)+1;
 uint16_t y = (rand() % 480)+1;
 uint16_t c = (rand() % 0xFFFF)+1;
-tft.drawCharGFX(x,y,"didier",c,1);
+tft.drawCharGFX(x,y,"RA8875",c,1);
 }
 delay(4000);
 tft.textMode();
