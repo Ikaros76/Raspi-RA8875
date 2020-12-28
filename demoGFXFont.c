@@ -10,7 +10,7 @@
 #include "Fonts/FreeMonoOblique24pt7b.h"
 #include "Fonts/FreeSerifBold60pt7b.h"
 
-raspiRA8875 tft = raspiRA8875();
+raspiRA8875 tft = raspiRA8875(3,2);
 
 int main(void) {
   tft.displayBegin();
