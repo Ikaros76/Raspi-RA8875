@@ -8,6 +8,7 @@
 #include "Fonts/FreeSans24pt7b.h"
 #include "Fonts/comic60pt7b.h"
 #include "Fonts/FreeMonoOblique24pt7b.h"
+#include "Fonts/FreeSerifBold60pt7b.h"
 
 raspiRA8875 tft = raspiRA8875();
 
@@ -20,4 +21,6 @@ int main(void) {
   tft.drawCharGFX(0,160,"Raspberry PI",RA8875_MAGENTA,1);
   tft.setFontGFX(&FreeMonoOblique24pt7b);
   tft.drawCharGFX(0,250,"800x480 RA8875",RA8875_BLUE,1);
+  tft.setFontGFX(&FreeSerifBold60pt7b);
+  tft.drawCharGFX(0,400,"Display 7''",RA8875_RED,1);
 }

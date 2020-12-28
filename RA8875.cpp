@@ -29,7 +29,7 @@ inline GFXglyph *pgm_read_glyph_ptr(const GFXfont *gfxFont, uint8_t c){
 }
 
 inline uint8_t *pgm_read_bitmap_ptr(const GFXfont *gfxFont) {
-return gfxFont->bitmap;
+  return gfxFont->bitmap;
 }
 
 raspiRA8875::raspiRA8875(void) {
@@ -37,144 +37,134 @@ raspiRA8875::raspiRA8875(void) {
 
 unsigned long raspiRA8875::millis(void) //unsigned long
 {
-struct timespec ts;
-clock_gettime(CLOCK_MONOTONIC, &ts);
-return ( ts.tv_sec * 1000 + ts.tv_nsec / 1000000L );
+  struct timespec ts;
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  return ( ts.tv_sec * 1000 + ts.tv_nsec / 1000000L );
 }
 
 void raspiRA8875::displaySpiBegin(void) {
-if (bcm2835_init() == -1) {
+  if (bcm2835_init() == -1) {
 	printf("SPI init error\n");
 	return;
 	}
-bcm2835_spi_begin();
-bcm2835_spi_setBitOrder(BCM2835_SPI_BIT_ORDER_MSBFIRST);
-bcm2835_spi_setDataMode(BCM2835_SPI_MODE0);
-bcm2835_spi_setClockDivider(BCM2835_SPI_CLOCK_DIVIDER_64);
-bcm2835_spi_chipSelect(BCM2835_SPI_CS0);
-bcm2835_spi_setChipSelectPolarity(BCM2835_SPI_CS0, LOW);
-bcm2835_gpio_fsel(CS,BCM2835_GPIO_FSEL_OUTP);
-bcm2835_gpio_fsel(RES,BCM2835_GPIO_FSEL_OUTP);
+  bcm2835_spi_begin();
+  bcm2835_spi_setBitOrder(BCM2835_SPI_BIT_ORDER_MSBFIRST);
+  bcm2835_spi_setDataMode(BCM2835_SPI_MODE0);
+  bcm2835_spi_setClockDivider(BCM2835_SPI_CLOCK_DIVIDER_64);
+  bcm2835_spi_chipSelect(BCM2835_SPI_CS0);
+  bcm2835_spi_setChipSelectPolarity(BCM2835_SPI_CS0, LOW);
+  bcm2835_gpio_fsel(CS,BCM2835_GPIO_FSEL_OUTP);
+  bcm2835_gpio_fsel(RES,BCM2835_GPIO_FSEL_OUTP);
 }
 
 void raspiRA8875::writeData(uint8_t c) {
-bcm2835_gpio_write(CS, LOW);
-bcm2835_spi_transfer(0x00);
-bcm2835_spi_transfer(c);
-bcm2835_gpio_write(CS, HIGH);
+  bcm2835_gpio_write(CS, LOW);
+  bcm2835_spi_transfer(0x00);
+  bcm2835_spi_transfer(c);
+  bcm2835_gpio_write(CS, HIGH);
 }
 
 void raspiRA8875::writeCommand(uint8_t c) {
-bcm2835_gpio_write(CS, LOW);
-bcm2835_spi_transfer(0x80);
-bcm2835_spi_transfer(c);
-bcm2835_gpio_write(CS, HIGH);
+  bcm2835_gpio_write(CS, LOW);
+  bcm2835_spi_transfer(0x80);
+  bcm2835_spi_transfer(c);
+  bcm2835_gpio_write(CS, HIGH);
 }
 
 uint8_t raspiRA8875::readData(void) {
-bcm2835_gpio_write(CS, LOW);
-bcm2835_spi_transfer(RA8875_DATAREAD);
-uint8_t c = bcm2835_spi_transfer(0x0);
-bcm2835_gpio_write(CS, HIGH);
-return c;
+  bcm2835_gpio_write(CS, LOW);
+  bcm2835_spi_transfer(RA8875_DATAREAD);
+  uint8_t c = bcm2835_spi_transfer(0x0);
+  bcm2835_gpio_write(CS, HIGH);
+  return c;
 }
 
 void raspiRA8875::writeReg(const uint8_t reg, uint8_t val) {
-writeCommand(reg);
-writeData(val);
+  writeCommand(reg);
+  writeData(val);
 }
 
 void raspiRA8875::waitBusy(uint8_t res) {
-uint8_t temp;
-unsigned long start = millis();
-do {
-  if (res == 0x01) writeCommand(RA8875_DMACR);
-  bcm2835_gpio_write(CS, LOW);
-  bcm2835_spi_transfer(RA8875_CMDREAD);
-  temp = bcm2835_spi_transfer(0x0);
-  bcm2835_gpio_write(CS, HIGH);
-  if ((millis() - start) > 10) return;
-} while ((temp & res) == res);
+  uint8_t temp;
+  unsigned long start = millis();
+  do {
+  	if (res == 0x01) writeCommand(RA8875_DMACR);
+  	bcm2835_gpio_write(CS, LOW);
+  	bcm2835_spi_transfer(RA8875_CMDREAD);
+  	temp = bcm2835_spi_transfer(0x0);
+  	bcm2835_gpio_write(CS, HIGH);
+  	if ((millis() - start) > 10) return;
+  } while ((temp & res) == res);
 }
 
 void raspiRA8875::textWrite(const char *buffer) {
-uint16_t len = strlen(buffer);
-//writeCommand(RA8875_MRWC);
-for (uint16_t i = 0; i < len; i++) {
-textEnlarge(_scale);
-writeCommand(RA8875_MRWC);
-writeData(buffer[i]);
-waitBusy(0x80);
-}
+  uint16_t len = strlen(buffer);
+  for (uint16_t i = 0; i < len; i++) {
+  	textEnlarge(_scale);
+  	writeCommand(RA8875_MRWC);
+  	writeData(buffer[i]);
+  	waitBusy(0x80);
+  }
 }
 
 void raspiRA8875::displayBegin(void) {
-displaySpiBegin();
-bcm2835_gpio_fsel(CS, BCM2835_GPIO_FSEL_OUTP);
-bcm2835_gpio_fsel(RES, BCM2835_GPIO_FSEL_OUTP);
-bcm2835_gpio_write(CS, HIGH);
-bcm2835_gpio_write(RES, LOW);
-delay(100);
-bcm2835_gpio_write(RES, HIGH);
-delay(100);;
-//writeReg(0x01, 0x00 | 0x80);
-writeReg(RA8875_P1CR,(RA8875_P1CR_ENABLE | (RA8875_PWM_CLK_DIV1024 & 0xF)));
-writeReg(RA8875_P1DCR,255);
-
-writeReg(RA8875_PLLC1, RA8875_PLLC1_PLLDIV1 + 11);
-delay(1);
-writeReg(RA8875_PLLC2, RA8875_PLLC2_DIV4);
-delay(1);
-writeReg(RA8875_SYSR, RA8875_SYSR_16BPP | RA8875_SYSR_MCU8);
-writeReg(RA8875_PCSR, RA8875_PCSR_PDATL | RA8875_PCSR_4CLK);
-delay(1);
-writeReg(RA8875_HDWR, (800 / 8) - 1);
-writeReg(RA8875_HNDFTR, RA8875_HNDFTR_DE_HIGH + 0);
-writeReg(RA8875_HNDR, (26 - 0 - 2)/8);
-writeReg(RA8875_HSTR, 23 / 8 -1);
-writeReg(RA8875_HPWR, RA8875_HPWR_LOW + (2 / 8 - 1));
-writeReg(RA8875_VDHR0, (uint16_t)(480 -1 + 0) & 0xFF);
-writeReg(RA8875_VDHR1, (uint16_t)(480 -1 + 0) >> 8);
-writeReg(RA8875_VNDR0, 26 - 1);
-writeReg(RA8875_VNDR1, 26 >> 8);
-writeReg(RA8875_VSTR0, 32 - 1);
-writeReg(RA8875_VSTR1, 32 >> 8);
-writeReg(RA8875_VPWR, RA8875_VPWR_LOW + 2 - 1);
-
-writeReg(RA8875_HSAW0, 0);
-writeReg(RA8875_HSAW1, 0);
-writeReg(RA8875_HEAW0, (uint16_t)(800 - 1) & 0xFF);
-writeReg(RA8875_HEAW1, (uint16_t)(800 - 1) >> 8);
-
-writeReg(RA8875_VSAW0, 0 + 0);
-writeReg(RA8875_VSAW1, 0 + 0);
-writeReg(RA8875_VEAW0, (uint16_t)(480 - 1 + 0) & 0xFF);
-writeReg(RA8875_VEAW1, (uint16_t)(480 - 1 + 0) >> 8);
-
-// Clear the entire window
-
-writeReg(RA8875_MCLR, RA8875_MCLR_START | RA8875_MCLR_FULL);
-delay(500);
+  displaySpiBegin();
+  bcm2835_gpio_fsel(CS, BCM2835_GPIO_FSEL_OUTP);
+  bcm2835_gpio_fsel(RES, BCM2835_GPIO_FSEL_OUTP);
+  bcm2835_gpio_write(CS, HIGH);
+  bcm2835_gpio_write(RES, LOW);
+  delay(100);
+  bcm2835_gpio_write(RES, HIGH);
+  delay(100);;
+  writeReg(RA8875_P1CR,(RA8875_P1CR_ENABLE | (RA8875_PWM_CLK_DIV1024 & 0xF)));
+  writeReg(RA8875_P1DCR,255);
+  writeReg(RA8875_PLLC1, RA8875_PLLC1_PLLDIV1 + 11);
+  delay(1);
+  writeReg(RA8875_PLLC2, RA8875_PLLC2_DIV4);
+  delay(1);
+  writeReg(RA8875_SYSR, RA8875_SYSR_16BPP | RA8875_SYSR_MCU8);
+  writeReg(RA8875_PCSR, RA8875_PCSR_PDATL | RA8875_PCSR_4CLK);
+  delay(1);
+  writeReg(RA8875_HDWR, (800 / 8) - 1);
+  writeReg(RA8875_HNDFTR, RA8875_HNDFTR_DE_HIGH + 0);
+  writeReg(RA8875_HNDR, (26 - 0 - 2)/8);
+  writeReg(RA8875_HSTR, 23 / 8 -1);
+  writeReg(RA8875_HPWR, RA8875_HPWR_LOW + (2 / 8 - 1));
+  writeReg(RA8875_VDHR0, (uint16_t)(480 -1 + 0) & 0xFF);
+  writeReg(RA8875_VDHR1, (uint16_t)(480 -1 + 0) >> 8);
+  writeReg(RA8875_VNDR0, 26 - 1);
+  writeReg(RA8875_VNDR1, 26 >> 8);
+  writeReg(RA8875_VSTR0, 32 - 1);
+  writeReg(RA8875_VSTR1, 32 >> 8);
+  writeReg(RA8875_VPWR, RA8875_VPWR_LOW + 2 - 1);
+  writeReg(RA8875_HSAW0, 0);
+  writeReg(RA8875_HSAW1, 0);
+  writeReg(RA8875_HEAW0, (uint16_t)(800 - 1) & 0xFF);
+  writeReg(RA8875_HEAW1, (uint16_t)(800 - 1) >> 8);
+  writeReg(RA8875_VSAW0, 0 + 0);
+  writeReg(RA8875_VSAW1, 0 + 0);
+  writeReg(RA8875_VEAW0, (uint16_t)(480 - 1 + 0) & 0xFF);
+  writeReg(RA8875_VEAW1, (uint16_t)(480 - 1 + 0) >> 8);
+  // Clear the entire window
+  writeReg(RA8875_MCLR, RA8875_MCLR_START | RA8875_MCLR_FULL);
+  delay(500);
 }
 
 void raspiRA8875::textMode(void) {
-_textMode = true;
-writeCommand(RA8875_MWCR0);
-uint8_t temp = readData();
-temp |= RA8875_MWCR0_TXTMODE;
-writeData(temp);
-
-writeCommand(0x21);
-temp = readData();
-temp &= ~((1 << 7) | (1 << 5));
-writeData(temp);
+  _textMode = true;
+  writeCommand(RA8875_MWCR0);
+  uint8_t temp = readData();
+  temp |= RA8875_MWCR0_TXTMODE;
+  writeData(temp);
+  writeCommand(0x21);
+  temp = readData();
+  temp &= ~((1 << 7) | (1 << 5));
+  writeData(temp);
 }
 
 void raspiRA8875::displayOn(bool on) {
-if (on)
-  writeReg(RA8875_PWRR, RA8875_PWRR_NORMAL | RA8875_PWRR_DISPON);
-else
-  writeReg(RA8875_PWRR, RA8875_PWRR_NORMAL | RA8875_PWRR_DISPOFF);
+  if (on) writeReg(RA8875_PWRR, RA8875_PWRR_NORMAL | RA8875_PWRR_DISPON);
+  else writeReg(RA8875_PWRR, RA8875_PWRR_NORMAL | RA8875_PWRR_DISPOFF);
 }
 
 void raspiRA8875::setTextCursor(uint16_t x, uint16_t y) {
