@@ -1,4 +1,6 @@
-
+enum RA8875sizes {
+  RA8875_480x80, RA8875_480x128, RA8875_480x272, RA8875_800x480
+};
 
 typedef struct {
   uint16_t	bitmapOffset;
@@ -23,8 +25,8 @@ public:
 
 raspiRA8875(uint8_t cs, uint8_t rst);
 unsigned long millis(void);
-void displaySpiBegin(void);
-void displayBegin(void);
+void SPIBegin(void);
+bool displayBegin(enum RA8875sizes);
 void displayOn(bool on);
 void writeData(uint8_t c);
 void writeCommand(uint8_t c);
@@ -49,6 +51,8 @@ private:
   uint8_t  _scale = 0;
   bool     _textMode = false;
   uint8_t  _cs, _rst;
+  uint16_t _width, _height;
+  enum RA8875sizes _size;
 
   GFXfont  *gfxFont;
 };

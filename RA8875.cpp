@@ -12,9 +12,6 @@
 #include "RA8875Register.h"
 #include "RA8875.h"
 
-#define RES	2
-#define CS	3
-
 #define bitRead(value, bit) (((value) >> (bit)) & 0x01)
 #define bitSet(value, bit) ((value) |= (1UL << (bit))
 #define bitClear(value, bit) ((value) &= ~(1UL << (bit)))
@@ -44,19 +41,12 @@ unsigned long raspiRA8875::millis(void) //unsigned long
   return ( ts.tv_sec * 1000 + ts.tv_nsec / 1000000L );
 }
 
-void raspiRA8875::displaySpiBegin(void) {
-  if (bcm2835_init() == -1) {
-	printf("SPI init error\n");
-	return;
-	}
-  bcm2835_spi_begin();
+void raspiRA8875::SPIBegin(void) {
   bcm2835_spi_setBitOrder(BCM2835_SPI_BIT_ORDER_MSBFIRST);
   bcm2835_spi_setDataMode(BCM2835_SPI_MODE0);
   bcm2835_spi_setClockDivider(BCM2835_SPI_CLOCK_DIVIDER_64);
   bcm2835_spi_chipSelect(BCM2835_SPI_CS0);
   bcm2835_spi_setChipSelectPolarity(BCM2835_SPI_CS0, LOW);
-  bcm2835_gpio_fsel(_cs,BCM2835_GPIO_FSEL_OUTP);
-  bcm2835_gpio_fsel(_rst,BCM2835_GPIO_FSEL_OUTP);
 }
 
 void raspiRA8875::writeData(uint8_t c) {
@@ -109,8 +99,26 @@ void raspiRA8875::textWrite(const char *buffer) {
   }
 }
 
-void raspiRA8875::displayBegin(void) {
-  displaySpiBegin();
+bool raspiRA8875::displayBegin(enum RA8875sizes size) {
+  _size = size;
+  if (_size == RA8875_480x80) {
+    _width = 480;
+    _height = 80;
+  } else if (_size == RA8875_480x128) {
+    _width = 480;
+    _height = 128;
+  } else if (_size == RA8875_480x272) {
+    _width = 480;
+    _height = 272;
+  } else if (_size == RA8875_800x480) {
+    _width = 800;
+    _height = 480;
+  } else return false;
+  if(bcm2835_init() == -1) {
+    printf("BCM2835 init error!\n");
+    return false;
+  }
+  SPIBegin();
   bcm2835_gpio_fsel(_cs, BCM2835_GPIO_FSEL_OUTP);
   bcm2835_gpio_fsel(_rst, BCM2835_GPIO_FSEL_OUTP);
   bcm2835_gpio_write(_cs, HIGH);
@@ -150,6 +158,7 @@ void raspiRA8875::displayBegin(void) {
   // Clear the entire window
   writeReg(RA8875_MCLR, RA8875_MCLR_START | RA8875_MCLR_FULL);
   delay(500);
+  return true;
 }
 
 void raspiRA8875::textMode(void) {

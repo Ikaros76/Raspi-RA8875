@@ -13,7 +13,10 @@
 raspiRA8875 tft = raspiRA8875(3,2);
 
 int main(void) {
-  tft.displayBegin();
+  if(!tft.displayBegin(RA8875_800x480)) {
+    printf("LCD not found!\n");
+    while(1);
+  }
   tft.displayOn(true);
   tft.setFontGFX(&FreeSans24pt7b);
   tft.drawCharGFX(0,40,"RA8875 Raspberry PI",RA8875_GREEN,1);
