@@ -4,7 +4,6 @@
 #include <stdlib.h>
 
 #include "RA8875.h"
-#include "RA8875Register.h"
 
 raspiRA8875 tft = raspiRA8875(3, 2);
 

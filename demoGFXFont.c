@@ -4,7 +4,7 @@
 #include <string.h>
 
 #include "RA8875.h"
-#include "RA8875Register.h"
+
 #include "Fonts/FreeSans24pt7b.h"
 #include "Fonts/comic60pt7b.h"
 #include "Fonts/FreeMonoOblique24pt7b.h"

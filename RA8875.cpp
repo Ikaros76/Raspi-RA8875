@@ -9,7 +9,6 @@
 
 #include <bcm2835.h>
 
-#include "RA8875Register.h"
 #include "RA8875.h"
 
 #define bitRead(value, bit) (((value) >> (bit)) & 0x01)
