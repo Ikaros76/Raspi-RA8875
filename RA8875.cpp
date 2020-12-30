@@ -241,11 +241,11 @@ writeReg(RA8875_CURH1, x >> 8);
 writeReg(RA8875_CURV0, y);
 writeReg(RA8875_CURV1, y >> 8);
 writeCommand(RA8875_MRWC);
-bcm2835_gpio_write(CS, LOW);
+bcm2835_gpio_write(_cs, LOW);
 bcm2835_spi_transfer(RA8875_DATAWRITE);
 bcm2835_spi_transfer(color >> 8);
 bcm2835_spi_transfer(color);
-bcm2835_gpio_write(CS, HIGH);
+bcm2835_gpio_write(_cs, HIGH);
 }
 
 void raspiRA8875::clearMemory(bool stop) {
