@@ -88,16 +88,6 @@ void raspiRA8875::waitBusy(uint8_t res) {
   } while ((temp & res) == res);
 }
 
-void raspiRA8875::textWrite(const char *buffer) {
-  uint16_t len = strlen(buffer);
-  for (uint16_t i = 0; i < len; i++) {
-  	textEnlarge(_scale);
-  	writeCommand(RA8875_MRWC);
-  	writeData(buffer[i]);
-  	waitBusy(0x80);
-  }
-}
-
 bool raspiRA8875::displayBegin(enum RA8875sizes size) {
   _size = size;
   if (_size == RA8875_480x80) {
@@ -160,6 +150,11 @@ bool raspiRA8875::displayBegin(enum RA8875sizes size) {
   return true;
 }
 
+void raspiRA8875::displayOn(bool on) {
+  if (on) writeReg(RA8875_PWRR, RA8875_PWRR_NORMAL | RA8875_PWRR_DISPON);
+  else writeReg(RA8875_PWRR, RA8875_PWRR_NORMAL | RA8875_PWRR_DISPOFF);
+}
+
 void raspiRA8875::textMode(void) {
   _textMode = true;
   writeCommand(RA8875_MWCR0);
@@ -179,9 +174,14 @@ void raspiRA8875::graphicsMode(void) {
   writeData(temp);
 }
 
-void raspiRA8875::displayOn(bool on) {
-  if (on) writeReg(RA8875_PWRR, RA8875_PWRR_NORMAL | RA8875_PWRR_DISPON);
-  else writeReg(RA8875_PWRR, RA8875_PWRR_NORMAL | RA8875_PWRR_DISPOFF);
+void raspiRA8875::textWrite(const char *buffer) {
+  uint16_t len = strlen(buffer);
+  for (uint16_t i = 0; i < len; i++) {
+  	textEnlarge(_scale);
+  	writeCommand(RA8875_MRWC);
+  	writeData(buffer[i]);
+  	waitBusy(0x80);
+  }
 }
 
 void raspiRA8875::setTextCursor(uint16_t x, uint16_t y) {
@@ -232,7 +232,6 @@ uint8_t temp = readData();
 temp &= ~(1 << 6);
 writeData(temp);
 }
-
 
 void raspiRA8875::drawPixel(int16_t x, int16_t y, uint16_t color) {
 writeReg(RA8875_CURH0, x);
