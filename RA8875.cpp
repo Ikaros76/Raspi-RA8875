@@ -43,7 +43,7 @@ unsigned long raspiRA8875::millis(void) //unsigned long
 void raspiRA8875::SPIBegin(void) {
   bcm2835_spi_setBitOrder(BCM2835_SPI_BIT_ORDER_MSBFIRST);
   bcm2835_spi_setDataMode(BCM2835_SPI_MODE0);
-  bcm2835_spi_setClockDivider(BCM2835_SPI_CLOCK_DIVIDER_64);
+  bcm2835_spi_setClockDivider(BCM2835_SPI_CLOCK_DIVIDER_32);
   bcm2835_spi_chipSelect(BCM2835_SPI_CS0);
   bcm2835_spi_setChipSelectPolarity(BCM2835_SPI_CS0, LOW);
 }
@@ -90,7 +90,24 @@ void raspiRA8875::waitBusy(uint8_t res) {
 
 bool raspiRA8875::displayBegin(enum RA8875sizes size) {
   _size = size;
+  uint8_t pixclk;
+  uint8_t hsync_start;
+  uint8_t hsync_pw;
+  uint8_t hsync_finetune;
+  uint8_t hsync_nondispl;
+  uint8_t vsync_pw;
+  uint16_t vsync_nondisp;
+  uint16_t vsync_start;
   if (_size == RA8875_480x80) {
+    pixclk = RA8875_PCSR_PDATL | RA8875_PCSR_4CLK;
+    hsync_nondispl = 10;
+    hsync_start = 8;
+    hsync_pw = 48;
+    hsync_finetune = 0;
+    vsync_nondisp = 3;
+    vsync_start = 8;
+    vsync_pw = 10;
+    _voffset = 192;
     _width = 480;
     _height = 80;
   } else if (_size == RA8875_480x128) {

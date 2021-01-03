@@ -49,6 +49,7 @@ void drawCharGFX(int16_t x, int16_t y, const char *c, uint16_t color, uint8_t si
 
 private:
   uint8_t  _scale = 0;
+  uint8_t  _voffset;
   bool     _textMode = false;
   uint8_t  _cs, _rst;
   uint16_t _width, _height;
