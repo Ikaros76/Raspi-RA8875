@@ -91,7 +91,8 @@ void raspiRA8875::waitBusy(uint8_t res) {
 bool raspiRA8875::waitPoll(uint8_t regname, uint8_t waitflag) {
   /* Wait for the command to finish */
   while (1) {
-    uint8_t temp = readReg(regname);
+    writeCommand(regname);
+    uint8_t temp = readData();
     if (!(temp & waitflag))
       return true;
   }
@@ -274,10 +275,10 @@ bcm2835_gpio_write(_cs, HIGH);
 }
 
 void raspiRA8875::drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1,uint16_t color) {
-  x0 = applyRotationX(x0);
-  y0 = applyRotationY(y0);
-  x1 = applyRotationX(x1);
-  y1 = applyRotationY(y1);
+//  x0 = applyRotationX(x0);
+//  y0 = applyRotationY(y0);
+//  x1 = applyRotationX(x1);
+//  y1 = applyRotationY(y1);
 
   writeCommand(0x91);
   writeData(x0);
