@@ -23,28 +23,28 @@ class raspiRA8875 {
 
 public:
 
-  raspiRA8875(uint8_t cs, uint8_t rst, uint8_t spi_clock_div);
+  raspiRA8875(uint8_t cs, uint8_t rst);
   unsigned long millis(void);
   void SPIBegin(void);
   bool displayBegin(enum RA8875sizes);
   void displayOn(bool on);
-void writeData(uint8_t c);
-void writeCommand(uint8_t c);
-uint8_t readData(void);
-void writeReg(const uint8_t reg, uint8_t val);
-void waitBusy(uint8_t res);
-bool waitPoll(uint8_t r, uint8_t f);
+  void writeData(uint8_t c);
+  void writeCommand(uint8_t c);
+  uint8_t readData(void);
+  void writeReg(const uint8_t reg, uint8_t val);
+  void waitBusy(uint8_t res);
+  bool waitPoll(uint8_t r, uint8_t f);
 
-void textMode(void);
-void graphicsMode(void);
-void textWrite(const char *buffer);
-void textEnlarge(uint8_t scale);
-void setTextCursor(uint16_t x, uint16_t y);
-void setTextColor(uint16_t foreColor, uint16_t bgColor);
-void drawPixel(int16_t x, int16_t y, uint16_t color);
-void fillScreen(uint16_t color);
-void drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color);
-void drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
+  void textMode(void);
+  void graphicsMode(void);
+  void textWrite(const char *buffer);
+  void textEnlarge(uint8_t scale);
+  void setTextCursor(uint16_t x, uint16_t y);
+  void setTextColor(uint16_t foreColor, uint16_t bgColor);
+  void drawPixel(int16_t x, int16_t y, uint16_t color);
+  void fillScreen(uint16_t color);
+  void drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color);
+  void drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
   void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
   void drawCircle(int16_t x, int16_t y, int16_t r, uint16_t color);
   void fillCircle(int16_t x, int16_t y, int16_t r, uint16_t color);
@@ -64,36 +64,32 @@ void drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
                      uint16_t color);
   void fillRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t r,
                      uint16_t color);
-
-  /* Scroll */
   void setScrollWindow(int16_t x, int16_t y, int16_t w, int16_t h,
                        uint8_t mode);
   void scrollX(int16_t dist);
   void scrollY(int16_t dist);
-
-  /* Backlight */
   void GPIOX(bool on);
   void PWM1config(bool on, uint8_t clock);
   void PWM2config(bool on, uint8_t clock);
   void PWM1out(uint8_t p);
   void PWM2out(uint8_t p);
 
-void clearMemory(bool stop);
-void clearActiveWindow(bool full);
+  void clearMemory(bool stop);
+  void clearActiveWindow(bool full);
 
-void setFontGFX(const GFXfont *f = NULL);
-void drawCharGFX(int16_t x, int16_t y, const char *c, uint16_t color, uint8_t size);
+  void setFontGFX(const GFXfont *f = NULL);
+  void drawCharGFX(int16_t x, int16_t y, const char *c, uint16_t color, uint8_t size);
 
 private:
 
-int16_t applyRotationX(int16_t x);
-int16_t applyRotationY(int16_t y);
-void circleHelper(int16_t x, int16_t y, int16_t r, uint16_t color, bool filled);
-void rectHelper(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color, bool filled);
-void triangleHelper(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color, bool filled);
-void ellipseHelper(int16_t xCenter, int16_t yCenter, int16_t longAxis, int16_t shortAxis, uint16_t color, bool filled);
-void curveHelper(int16_t xCenter, int16_t yCenter, int16_t longAxis, int16_t shortAxis, uint8_t curvePart, uint16_t color, bool filled);
-void roundRectHelper(int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16_t color, bool filled);
+  int16_t applyRotationX(int16_t x);
+  int16_t applyRotationY(int16_t y);
+  void circleHelper(int16_t x, int16_t y, int16_t r, uint16_t color, bool filled);
+  void rectHelper(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color, bool filled);
+  void triangleHelper(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color, bool filled);
+  void ellipseHelper(int16_t xCenter, int16_t yCenter, int16_t longAxis, int16_t shortAxis, uint16_t color, bool filled);
+  void curveHelper(int16_t xCenter, int16_t yCenter, int16_t longAxis, int16_t shortAxis, uint8_t curvePart, uint16_t color, bool filled);
+  void roundRectHelper(int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16_t color, bool filled);
 
   void swap(int16_t &x, int16_t &y) {
     int16_t temp = x;
@@ -107,6 +103,7 @@ void roundRectHelper(int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint
   uint8_t  _cs, _rst;
   uint16_t _width, _height;
   uint8_t _rotation;
+  uint16_t _spiClock;
   enum RA8875sizes _size;
 
   GFXfont  *gfxFont;
@@ -129,33 +126,33 @@ void roundRectHelper(int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint
 #define RA8875_CMDREAD 0xC0
 
 // Registers & bits
-#define RA8875_PWRR 0x01          
-#define RA8875_PWRR_DISPON 0x80   
-#define RA8875_PWRR_DISPOFF 0x00  
-#define RA8875_PWRR_SLEEP 0x02     
-#define RA8875_PWRR_NORMAL 0x00    
-#define RA8875_PWRR_SOFTRESET 0x01 
+#define RA8875_PWRR 0x01
+#define RA8875_PWRR_DISPON 0x80
+#define RA8875_PWRR_DISPOFF 0x00
+#define RA8875_PWRR_SLEEP 0x02
+#define RA8875_PWRR_NORMAL 0x00
+#define RA8875_PWRR_SOFTRESET 0x01
 
-#define RA8875_MRWC 0x02 
+#define RA8875_MRWC 0x02
 
-#define RA8875_GPIOX 0xC7 
+#define RA8875_GPIOX 0xC7
 
-#define RA8875_PLLC1 0x88         
-#define RA8875_PLLC1_PLLDIV2 0x80 
-#define RA8875_PLLC1_PLLDIV1 0x00 
+#define RA8875_PLLC1 0x88
+#define RA8875_PLLC1_PLLDIV2 0x80
+#define RA8875_PLLC1_PLLDIV1 0x00
 
-#define RA8875_PLLC2 0x89        
-#define RA8875_PLLC2_DIV1 0x00   
-#define RA8875_PLLC2_DIV2 0x01   
-#define RA8875_PLLC2_DIV4 0x02   
-#define RA8875_PLLC2_DIV8 0x03   
-#define RA8875_PLLC2_DIV16 0x04  
-#define RA8875_PLLC2_DIV32 0x05  
-#define RA8875_PLLC2_DIV64 0x06  
-#define RA8875_PLLC2_DIV128 0x07 
+#define RA8875_PLLC2 0x89
+#define RA8875_PLLC2_DIV1 0x00
+#define RA8875_PLLC2_DIV2 0x01
+#define RA8875_PLLC2_DIV4 0x02
+#define RA8875_PLLC2_DIV8 0x03
+#define RA8875_PLLC2_DIV16 0x04
+#define RA8875_PLLC2_DIV32 0x05
+#define RA8875_PLLC2_DIV64 0x06
+#define RA8875_PLLC2_DIV128 0x07
 
-#define RA8875_SYSR 0x10       
-#define RA8875_SYSR_8BPP 0x00  
+#define RA8875_SYSR 0x10
+#define RA8875_SYSR_8BPP 0x00
 #define RA8875_SYSR_16BPP 0x0C 
 #define RA8875_SYSR_MCU8 0x00  
 #define RA8875_SYSR_MCU16 0x03 

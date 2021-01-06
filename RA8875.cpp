@@ -5,6 +5,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <time.h>
+#include <string>
 #include <sys/time.h>
 
 #include <bcm2835.h>
@@ -28,7 +29,7 @@ inline uint8_t *pgm_read_bitmap_ptr(const GFXfont *gfxFont) {
   return gfxFont->bitmap;
 }
 
-raspiRA8875::raspiRA8875(uint8_t cs, uint8_t rst, uint8_t spi_clock_div) {
+raspiRA8875::raspiRA8875(uint8_t cs, uint8_t rst) {
   _cs = cs;
   _rst = rst;
 }
@@ -42,7 +43,7 @@ unsigned long raspiRA8875::millis(void) {
 void raspiRA8875::SPIBegin(void) {
   bcm2835_spi_setBitOrder(BCM2835_SPI_BIT_ORDER_MSBFIRST);
   bcm2835_spi_setDataMode(BCM2835_SPI_MODE0);
-  bcm2835_spi_setClockDivider(BCM2835_SPI_CLOCK_DIVIDER_32);
+  bcm2835_spi_setClockDivider(BCM2835_SPI_CLOCK_DIVIDER_64);
   bcm2835_spi_chipSelect(BCM2835_SPI_CS0);
   bcm2835_spi_setChipSelectPolarity(BCM2835_SPI_CS0, LOW);
 }
