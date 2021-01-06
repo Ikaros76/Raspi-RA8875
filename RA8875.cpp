@@ -28,13 +28,12 @@ inline uint8_t *pgm_read_bitmap_ptr(const GFXfont *gfxFont) {
   return gfxFont->bitmap;
 }
 
-raspiRA8875::raspiRA8875(uint8_t cs, uint8_t rst) {
+raspiRA8875::raspiRA8875(uint8_t cs, uint8_t rst, uint8_t spi_clock_div) {
   _cs = cs;
   _rst = rst;
 }
 
-unsigned long raspiRA8875::millis(void) //unsigned long
-{
+unsigned long raspiRA8875::millis(void) {
   struct timespec ts;
   clock_gettime(CLOCK_MONOTONIC, &ts);
   return ( ts.tv_sec * 1000 + ts.tv_nsec / 1000000L );

@@ -5,7 +5,7 @@
 
 #include "RA8875.h"
 
-raspiRA8875 tft = raspiRA8875(3, 2);
+raspiRA8875 tft = raspiRA8875(3, 2, 32);
 
 int main(void) {
   if(!tft.displayBegin(RA8875_800x480)) {

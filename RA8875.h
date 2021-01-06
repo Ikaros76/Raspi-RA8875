@@ -23,7 +23,7 @@ class raspiRA8875 {
 
 public:
 
-raspiRA8875(uint8_t cs, uint8_t rst);
+raspiRA8875(uint8_t cs, uint8_t rst, uint8_t spi_clock_div);
 unsigned long millis(void);
 void SPIBegin(void);
 bool displayBegin(enum RA8875sizes);
