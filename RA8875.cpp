@@ -312,6 +312,509 @@ void raspiRA8875::drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1,uint16
   waitPoll(RA8875_DCR, RA8875_DCR_LINESQUTRI_STATUS);
 }
 
+void Adafruit_RA8875::drawRect(int16_t x, int16_t y, int16_t w, int16_t h,
+                               uint16_t color) {
+  rectHelper(x, y, x + w - 1, y + h - 1, color, false);
+}
+
+void Adafruit_RA8875::fillRect(int16_t x, int16_t y, int16_t w, int16_t h,
+                               uint16_t color) {
+  rectHelper(x, y, x + w - 1, y + h - 1, color, true);
+}
+
+void Adafruit_RA8875::fillScreen(uint16_t color) {
+  rectHelper(0, 0, _width - 1, _height - 1, color, true);
+}
+
+void Adafruit_RA8875::drawCircle(int16_t x, int16_t y, int16_t r,
+                                 uint16_t color) {
+  circleHelper(x, y, r, color, false);
+}
+
+void Adafruit_RA8875::fillCircle(int16_t x, int16_t y, int16_t r,
+                                 uint16_t color) {
+  circleHelper(x, y, r, color, true);
+}
+
+void Adafruit_RA8875::drawTriangle(int16_t x0, int16_t y0, int16_t x1,
+                                   int16_t y1, int16_t x2, int16_t y2,
+                                   uint16_t color) {
+  triangleHelper(x0, y0, x1, y1, x2, y2, color, false);
+}
+
+void Adafruit_RA8875::fillTriangle(int16_t x0, int16_t y0, int16_t x1,
+                                   int16_t y1, int16_t x2, int16_t y2,
+                                   uint16_t color) {
+  triangleHelper(x0, y0, x1, y1, x2, y2, color, true);
+}
+
+void Adafruit_RA8875::drawEllipse(int16_t xCenter, int16_t yCenter,
+                                  int16_t longAxis, int16_t shortAxis,
+                                  uint16_t color) {
+  ellipseHelper(xCenter, yCenter, longAxis, shortAxis, color, false);
+}
+
+void Adafruit_RA8875::fillEllipse(int16_t xCenter, int16_t yCenter,
+                                  int16_t longAxis, int16_t shortAxis,
+                                  uint16_t color) {
+  ellipseHelper(xCenter, yCenter, longAxis, shortAxis, color, true);
+}
+
+void Adafruit_RA8875::drawCurve(int16_t xCenter, int16_t yCenter,
+                                int16_t longAxis, int16_t shortAxis,
+                                uint8_t curvePart, uint16_t color) {
+  curveHelper(xCenter, yCenter, longAxis, shortAxis, curvePart, color, false);
+}
+
+void Adafruit_RA8875::fillCurve(int16_t xCenter, int16_t yCenter,
+                                int16_t longAxis, int16_t shortAxis,
+                                uint8_t curvePart, uint16_t color) {
+  curveHelper(xCenter, yCenter, longAxis, shortAxis, curvePart, color, true);
+}
+
+void Adafruit_RA8875::drawRoundRect(int16_t x, int16_t y, int16_t w, int16_t h,
+                                    int16_t r, uint16_t color) {
+  roundRectHelper(x, y, x + w, y + h, r, color, false);
+}
+
+void Adafruit_RA8875::fillRoundRect(int16_t x, int16_t y, int16_t w, int16_t h,
+                                    int16_t r, uint16_t color) {
+  roundRectHelper(x, y, x + w, y + h, r, color, true);
+}
+
+void Adafruit_RA8875::circleHelper(int16_t x, int16_t y, int16_t r,
+                                   uint16_t color, bool filled) {
+  x = applyRotationX(x);
+  y = applyRotationY(y);
+
+  /* Set X */
+  writeCommand(0x99);
+  writeData(x);
+  writeCommand(0x9a);
+  writeData(x >> 8);
+
+  /* Set Y */
+  writeCommand(0x9b);
+  writeData(y);
+  writeCommand(0x9c);
+  writeData(y >> 8);
+
+  /* Set Radius */
+  writeCommand(0x9d);
+  writeData(r);
+
+  /* Set Color */
+  writeCommand(0x63);
+  writeData((color & 0xf800) >> 11);
+  writeCommand(0x64);
+  writeData((color & 0x07e0) >> 5);
+  writeCommand(0x65);
+  writeData((color & 0x001f));
+
+  /* Draw! */
+  writeCommand(RA8875_DCR);
+  if (filled) {
+    writeData(RA8875_DCR_CIRCLE_START | RA8875_DCR_FILL);
+  } else {
+    writeData(RA8875_DCR_CIRCLE_START | RA8875_DCR_NOFILL);
+  }
+
+  /* Wait for the command to finish */
+  waitPoll(RA8875_DCR, RA8875_DCR_CIRCLE_STATUS);
+}
+
+void Adafruit_RA8875::rectHelper(int16_t x, int16_t y, int16_t w, int16_t h,
+                                 uint16_t color, bool filled) {
+  x = applyRotationX(x);
+  y = applyRotationY(y);
+  w = applyRotationX(w);
+  h = applyRotationY(h);
+
+  /* Set X */
+  writeCommand(0x91);
+  writeData(x);
+  writeCommand(0x92);
+  writeData(x >> 8);
+
+  /* Set Y */
+  writeCommand(0x93);
+  writeData(y);
+  writeCommand(0x94);
+  writeData(y >> 8);
+
+  /* Set X1 */
+  writeCommand(0x95);
+  writeData(w);
+  writeCommand(0x96);
+  writeData((w) >> 8);
+
+  /* Set Y1 */
+  writeCommand(0x97);
+  writeData(h);
+  writeCommand(0x98);
+  writeData((h) >> 8);
+
+  /* Set Color */
+  writeCommand(0x63);
+  writeData((color & 0xf800) >> 11);
+  writeCommand(0x64);
+  writeData((color & 0x07e0) >> 5);
+  writeCommand(0x65);
+  writeData((color & 0x001f));
+
+  /* Draw! */
+  writeCommand(RA8875_DCR);
+  if (filled) {
+    writeData(0xB0);
+  } else {
+    writeData(0x90);
+  }
+
+  /* Wait for the command to finish */
+  waitPoll(RA8875_DCR, RA8875_DCR_LINESQUTRI_STATUS);
+}
+
+
+void Adafruit_RA8875::triangleHelper(int16_t x0, int16_t y0, int16_t x1,
+                                     int16_t y1, int16_t x2, int16_t y2,
+                                     uint16_t color, bool filled) {
+  x0 = applyRotationX(x0);
+  y0 = applyRotationY(y0);
+  x1 = applyRotationX(x1);
+  y1 = applyRotationY(y1);
+  x2 = applyRotationX(x2);
+  y2 = applyRotationY(y2);
+
+  /* Set Point 0 */
+  writeCommand(0x91);
+  writeData(x0);
+  writeCommand(0x92);
+  writeData(x0 >> 8);
+  writeCommand(0x93);
+  writeData(y0);
+  writeCommand(0x94);
+  writeData(y0 >> 8);
+
+  /* Set Point 1 */
+  writeCommand(0x95);
+  writeData(x1);
+  writeCommand(0x96);
+  writeData(x1 >> 8);
+  writeCommand(0x97);
+  writeData(y1);
+  writeCommand(0x98);
+  writeData(y1 >> 8);
+
+  /* Set Point 2 */
+  writeCommand(0xA9);
+  writeData(x2);
+  writeCommand(0xAA);
+  writeData(x2 >> 8);
+  writeCommand(0xAB);
+  writeData(y2);
+  writeCommand(0xAC);
+  writeData(y2 >> 8);
+
+  /* Set Color */
+  writeCommand(0x63);
+  writeData((color & 0xf800) >> 11);
+  writeCommand(0x64);
+  writeData((color & 0x07e0) >> 5);
+  writeCommand(0x65);
+  writeData((color & 0x001f));
+
+  /* Draw! */
+  writeCommand(RA8875_DCR);
+  if (filled) {
+    writeData(0xA1);
+  } else {
+    writeData(0x81);
+  }
+
+  /* Wait for the command to finish */
+  waitPoll(RA8875_DCR, RA8875_DCR_LINESQUTRI_STATUS);
+}
+
+void Adafruit_RA8875::ellipseHelper(int16_t xCenter, int16_t yCenter,
+                                    int16_t longAxis, int16_t shortAxis,
+                                    uint16_t color, bool filled) {
+  xCenter = applyRotationX(xCenter);
+  yCenter = applyRotationY(yCenter);
+
+  /* Set Center Point */
+  writeCommand(0xA5);
+  writeData(xCenter);
+  writeCommand(0xA6);
+  writeData(xCenter >> 8);
+  writeCommand(0xA7);
+  writeData(yCenter);
+  writeCommand(0xA8);
+  writeData(yCenter >> 8);
+
+  /* Set Long and Short Axis */
+  writeCommand(0xA1);
+  writeData(longAxis);
+  writeCommand(0xA2);
+  writeData(longAxis >> 8);
+  writeCommand(0xA3);
+  writeData(shortAxis);
+  writeCommand(0xA4);
+  writeData(shortAxis >> 8);
+
+  /* Set Color */
+  writeCommand(0x63);
+  writeData((color & 0xf800) >> 11);
+  writeCommand(0x64);
+  writeData((color & 0x07e0) >> 5);
+  writeCommand(0x65);
+  writeData((color & 0x001f));
+
+  /* Draw! */
+  writeCommand(0xA0);
+  if (filled) {
+    writeData(0xC0);
+  } else {
+    writeData(0x80);
+  }
+
+  /* Wait for the command to finish */
+  waitPoll(RA8875_ELLIPSE, RA8875_ELLIPSE_STATUS);
+}
+
+void Adafruit_RA8875::curveHelper(int16_t xCenter, int16_t yCenter,
+                                  int16_t longAxis, int16_t shortAxis,
+                                  uint8_t curvePart, uint16_t color,
+                                  bool filled) {
+  xCenter = applyRotationX(xCenter);
+  yCenter = applyRotationY(yCenter);
+  curvePart = (curvePart + _rotation) % 4;
+
+  /* Set Center Point */
+  writeCommand(0xA5);
+  writeData(xCenter);
+  writeCommand(0xA6);
+  writeData(xCenter >> 8);
+  writeCommand(0xA7);
+  writeData(yCenter);
+  writeCommand(0xA8);
+  writeData(yCenter >> 8);
+
+  /* Set Long and Short Axis */
+  writeCommand(0xA1);
+  writeData(longAxis);
+  writeCommand(0xA2);
+  writeData(longAxis >> 8);
+  writeCommand(0xA3);
+  writeData(shortAxis);
+  writeCommand(0xA4);
+  writeData(shortAxis >> 8);
+
+  /* Set Color */
+  writeCommand(0x63);
+  writeData((color & 0xf800) >> 11);
+  writeCommand(0x64);
+  writeData((color & 0x07e0) >> 5);
+  writeCommand(0x65);
+  writeData((color & 0x001f));
+
+  /* Draw! */
+  writeCommand(0xA0);
+  if (filled) {
+    writeData(0xD0 | (curvePart & 0x03));
+  } else {
+    writeData(0x90 | (curvePart & 0x03));
+  }
+
+  /* Wait for the command to finish */
+  waitPoll(RA8875_ELLIPSE, RA8875_ELLIPSE_STATUS);
+}
+
+void Adafruit_RA8875::roundRectHelper(int16_t x, int16_t y, int16_t w,
+                                      int16_t h, int16_t r, uint16_t color,
+                                      bool filled) {
+  x = applyRotationX(x);
+  y = applyRotationY(y);
+  w = applyRotationX(w);
+  h = applyRotationY(h);
+  if (x > w)
+    swap(x, w);
+  if (y > h)
+    swap(y, h);
+
+  /* Set X */
+  writeCommand(0x91);
+  writeData(x);
+  writeCommand(0x92);
+  writeData(x >> 8);
+
+  /* Set Y */
+  writeCommand(0x93);
+  writeData(y);
+  writeCommand(0x94);
+  writeData(y >> 8);
+
+  /* Set X1 */
+  writeCommand(0x95);
+  writeData(w);
+  writeCommand(0x96);
+  writeData((w) >> 8);
+
+  /* Set Y1 */
+  writeCommand(0x97);
+  writeData(h);
+  writeCommand(0x98);
+  writeData((h) >> 8);
+
+  writeCommand(0xA1);
+  writeData(r);
+  writeCommand(0xA2);
+  writeData((r) >> 8);
+
+  writeCommand(0xA3);
+  writeData(r);
+  writeCommand(0xA4);
+  writeData((r) >> 8);
+
+  /* Set Color */
+  writeCommand(0x63);
+  writeData((color & 0xf800) >> 11);
+  writeCommand(0x64);
+  writeData((color & 0x07e0) >> 5);
+  writeCommand(0x65);
+  writeData((color & 0x001f));
+
+  /* Draw! */
+  writeCommand(RA8875_ELLIPSE);
+  if (filled) {
+    writeData(0xE0);
+  } else {
+    writeData(0xA0);
+  }
+
+  /* Wait for the command to finish */
+  waitPoll(RA8875_ELLIPSE, RA8875_DCR_LINESQUTRI_STATUS);
+}
+
+void Adafruit_RA8875::setScrollWindow(int16_t x, int16_t y, int16_t w,
+                                      int16_t h, uint8_t mode) {
+  // Horizontal Start point of Scroll Window
+  writeCommand(0x38);
+  writeData(x);
+  writeCommand(0x39);
+  writeData(x >> 8);
+
+  // Vertical Start Point of Scroll Window
+  writeCommand(0x3a);
+  writeData(y);
+  writeCommand(0x3b);
+  writeData(y >> 8);
+
+  // Horizontal End Point of Scroll Window
+  writeCommand(0x3c);
+  writeData(x + w);
+  writeCommand(0x3d);
+  writeData((x + w) >> 8);
+
+  // Vertical End Point of Scroll Window
+  writeCommand(0x3e);
+  writeData(y + h);
+  writeCommand(0x3f);
+  writeData((y + h) >> 8);
+
+  // Scroll function setting
+  writeCommand(0x52);
+  writeData(mode);
+}
+
+/**************************************************************************/
+/*!
+    Scroll in the X direction
+
+    @param dist The distance to scroll
+
+ */
+/**************************************************************************/
+void Adafruit_RA8875::scrollX(int16_t dist) {
+  writeCommand(0x24);
+  writeData(dist);
+  writeCommand(0x25);
+  writeData(dist >> 8);
+}
+
+/**************************************************************************/
+/*!
+     Scroll in the Y direction
+
+     @param dist The distance to scroll
+
+ */
+/**************************************************************************/
+void Adafruit_RA8875::scrollY(int16_t dist) {
+  writeCommand(0x26);
+  writeData(dist);
+  writeCommand(0x27);
+  writeData(dist >> 8);
+}
+
+/************************* Mid Level ***********************************/
+
+/**************************************************************************/
+/*!
+    Set the Extra General Purpose IO Register
+
+    @param on Whether to turn Extra General Purpose IO on or not
+
+ */
+/**************************************************************************/
+void Adafruit_RA8875::GPIOX(boolean on) {
+  if (on)
+    writeReg(RA8875_GPIOX, 1);
+  else
+    writeReg(RA8875_GPIOX, 0);
+}
+
+/**************************************************************************/
+/*!
+    Set the duty cycle of the PWM 1 Clock
+
+    @param p The duty Cycle (0-255)
+*/
+/**************************************************************************/
+void Adafruit_RA8875::PWM1out(uint8_t p) { writeReg(RA8875_P1DCR, p); }
+
+/**************************************************************************/
+/*!
+     Set the duty cycle of the PWM 2 Clock
+
+     @param p The duty Cycle (0-255)
+*/
+/**************************************************************************/
+void Adafruit_RA8875::PWM2out(uint8_t p) { writeReg(RA8875_P2DCR, p); }
+
+/**************************************************************************/
+/*!
+    Configure the PWM 1 Clock
+
+    @param on Whether to enable the clock
+    @param clock The Clock Divider
+*/
+/**************************************************************************/
+void Adafruit_RA8875::PWM1config(boolean on, uint8_t clock) {
+  if (on) {
+    writeReg(RA8875_P1CR, RA8875_P1CR_ENABLE | (clock & 0xF));
+  } else {
+    writeReg(RA8875_P1CR, RA8875_P1CR_DISABLE | (clock & 0xF));
+  }
+}
+
+void Adafruit_RA8875::PWM2config(boolean on, uint8_t clock) {
+  if (on) {
+    writeReg(RA8875_P2CR, RA8875_P2CR_ENABLE | (clock & 0xF));
+  } else {
+    writeReg(RA8875_P2CR, RA8875_P2CR_DISABLE | (clock & 0xF));
+  }
+}
+
 void raspiRA8875::clearMemory(bool stop) {
 uint8_t temp;
 writeCommand(RA8875_MCLR);
