@@ -23,17 +23,18 @@ class raspiRA8875 {
 
 public:
 
-raspiRA8875(uint8_t cs, uint8_t rst, uint8_t spi_clock_div);
-unsigned long millis(void);
-void SPIBegin(void);
-bool displayBegin(enum RA8875sizes);
-void displayOn(bool on);
+  raspiRA8875(uint8_t cs, uint8_t rst, uint8_t spi_clock_div);
+  unsigned long millis(void);
+  void SPIBegin(void);
+  bool displayBegin(enum RA8875sizes);
+  void displayOn(bool on);
 void writeData(uint8_t c);
 void writeCommand(uint8_t c);
 uint8_t readData(void);
 void writeReg(const uint8_t reg, uint8_t val);
 void waitBusy(uint8_t res);
 bool waitPoll(uint8_t r, uint8_t f);
+
 void textMode(void);
 void graphicsMode(void);
 void textWrite(const char *buffer);
@@ -41,6 +42,7 @@ void textEnlarge(uint8_t scale);
 void setTextCursor(uint16_t x, uint16_t y);
 void setTextColor(uint16_t foreColor, uint16_t bgColor);
 void drawPixel(int16_t x, int16_t y, uint16_t color);
+void fillScreen(uint16_t color);
 void drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color);
 void drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
   void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
@@ -70,9 +72,9 @@ void drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
   void scrollY(int16_t dist);
 
   /* Backlight */
-  void GPIOX(boolean on);
-  void PWM1config(boolean on, uint8_t clock);
-  void PWM2config(boolean on, uint8_t clock);
+  void GPIOX(bool on);
+  void PWM1config(bool on, uint8_t clock);
+  void PWM2config(bool on, uint8_t clock);
   void PWM1out(uint8_t p);
   void PWM2out(uint8_t p);
 
@@ -83,13 +85,21 @@ void setFontGFX(const GFXfont *f = NULL);
 void drawCharGFX(int16_t x, int16_t y, const char *c, uint16_t color, uint8_t size);
 
 private:
-    
+
+int16_t applyRotationX(int16_t x);
+int16_t applyRotationY(int16_t y);
 void circleHelper(int16_t x, int16_t y, int16_t r, uint16_t color, bool filled);
 void rectHelper(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color, bool filled);
 void triangleHelper(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color, bool filled);
 void ellipseHelper(int16_t xCenter, int16_t yCenter, int16_t longAxis, int16_t shortAxis, uint16_t color, bool filled);
 void curveHelper(int16_t xCenter, int16_t yCenter, int16_t longAxis, int16_t shortAxis, uint8_t curvePart, uint16_t color, bool filled);
 void roundRectHelper(int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16_t color, bool filled);
+
+  void swap(int16_t &x, int16_t &y) {
+    int16_t temp = x;
+    x = y;
+    y = temp;
+  }
 
   uint8_t  _scale = 0;
   uint8_t  _voffset;
@@ -103,8 +113,8 @@ void roundRectHelper(int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint
 };
 
 // Colors (RGB565)
-#define RA8875_BLACK 0x0000   ///< Black Color
-#define RA8875_BLUE 0x001F    ///< Blue Color
+#define RA8875_BLACK 0x0000
+#define RA8875_BLUE 0x001F
 #define RA8875_RED 0xF800     ///< Red Color
 #define RA8875_GREEN 0x07E0   ///< Green Color
 #define RA8875_CYAN 0x07FF    ///< Cyan Color

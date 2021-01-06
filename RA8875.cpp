@@ -98,6 +98,24 @@ bool raspiRA8875::waitPoll(uint8_t regname, uint8_t waitflag) {
   return false; // MEMEFIX: yeah i know, unreached! - add timeout?
 }
 
+int16_t raspiRA8875::applyRotationX(int16_t x) {
+  switch (_rotation) {
+  case 2:
+    x = _width - 1 - x;
+    break;
+  }
+  return x;
+}
+
+int16_t raspiRA8875::applyRotationY(int16_t y) {
+  switch (_rotation) {
+  case 2:
+    y = _height - 1 - y;
+    break;
+  }
+  return y + _voffset;
+}
+
 bool raspiRA8875::displayBegin(enum RA8875sizes size) {
   _size = size;
   uint8_t pixclk;
@@ -212,14 +230,14 @@ void raspiRA8875::textWrite(const char *buffer) {
 }
 
 void raspiRA8875::setTextCursor(uint16_t x, uint16_t y) {
-writeCommand(0x2A);
-writeData(x & 0xFF);
-writeCommand(0x2B);
-writeData(x >> 8);
-writeCommand(0x2C);
-writeData(y & 0xFF);
-writeCommand(0x2D);
-writeData(y >> 8);
+  writeCommand(0x2A);
+  writeData(x & 0xFF);
+  writeCommand(0x2B);
+  writeData(x >> 8);
+  writeCommand(0x2C);
+  writeData(y & 0xFF);
+  writeCommand(0x2D);
+  writeData(y >> 8);
 }
 
 void raspiRA8875::textEnlarge(uint8_t scale) {
@@ -312,77 +330,77 @@ void raspiRA8875::drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1,uint16
   waitPoll(RA8875_DCR, RA8875_DCR_LINESQUTRI_STATUS);
 }
 
-void Adafruit_RA8875::drawRect(int16_t x, int16_t y, int16_t w, int16_t h,
+void raspiRA8875::drawRect(int16_t x, int16_t y, int16_t w, int16_t h,
                                uint16_t color) {
   rectHelper(x, y, x + w - 1, y + h - 1, color, false);
 }
 
-void Adafruit_RA8875::fillRect(int16_t x, int16_t y, int16_t w, int16_t h,
+void raspiRA8875::fillRect(int16_t x, int16_t y, int16_t w, int16_t h,
                                uint16_t color) {
   rectHelper(x, y, x + w - 1, y + h - 1, color, true);
 }
 
-void Adafruit_RA8875::fillScreen(uint16_t color) {
+void raspiRA8875::fillScreen(uint16_t color) {
   rectHelper(0, 0, _width - 1, _height - 1, color, true);
 }
 
-void Adafruit_RA8875::drawCircle(int16_t x, int16_t y, int16_t r,
+void raspiRA8875::drawCircle(int16_t x, int16_t y, int16_t r,
                                  uint16_t color) {
   circleHelper(x, y, r, color, false);
 }
 
-void Adafruit_RA8875::fillCircle(int16_t x, int16_t y, int16_t r,
+void raspiRA8875::fillCircle(int16_t x, int16_t y, int16_t r,
                                  uint16_t color) {
   circleHelper(x, y, r, color, true);
 }
 
-void Adafruit_RA8875::drawTriangle(int16_t x0, int16_t y0, int16_t x1,
+void raspiRA8875::drawTriangle(int16_t x0, int16_t y0, int16_t x1,
                                    int16_t y1, int16_t x2, int16_t y2,
                                    uint16_t color) {
   triangleHelper(x0, y0, x1, y1, x2, y2, color, false);
 }
 
-void Adafruit_RA8875::fillTriangle(int16_t x0, int16_t y0, int16_t x1,
+void raspiRA8875::fillTriangle(int16_t x0, int16_t y0, int16_t x1,
                                    int16_t y1, int16_t x2, int16_t y2,
                                    uint16_t color) {
   triangleHelper(x0, y0, x1, y1, x2, y2, color, true);
 }
 
-void Adafruit_RA8875::drawEllipse(int16_t xCenter, int16_t yCenter,
+void raspiRA8875::drawEllipse(int16_t xCenter, int16_t yCenter,
                                   int16_t longAxis, int16_t shortAxis,
                                   uint16_t color) {
   ellipseHelper(xCenter, yCenter, longAxis, shortAxis, color, false);
 }
 
-void Adafruit_RA8875::fillEllipse(int16_t xCenter, int16_t yCenter,
+void raspiRA8875::fillEllipse(int16_t xCenter, int16_t yCenter,
                                   int16_t longAxis, int16_t shortAxis,
                                   uint16_t color) {
   ellipseHelper(xCenter, yCenter, longAxis, shortAxis, color, true);
 }
 
-void Adafruit_RA8875::drawCurve(int16_t xCenter, int16_t yCenter,
+void raspiRA8875::drawCurve(int16_t xCenter, int16_t yCenter,
                                 int16_t longAxis, int16_t shortAxis,
                                 uint8_t curvePart, uint16_t color) {
   curveHelper(xCenter, yCenter, longAxis, shortAxis, curvePart, color, false);
 }
 
-void Adafruit_RA8875::fillCurve(int16_t xCenter, int16_t yCenter,
+void raspiRA8875::fillCurve(int16_t xCenter, int16_t yCenter,
                                 int16_t longAxis, int16_t shortAxis,
                                 uint8_t curvePart, uint16_t color) {
   curveHelper(xCenter, yCenter, longAxis, shortAxis, curvePart, color, true);
 }
 
-void Adafruit_RA8875::drawRoundRect(int16_t x, int16_t y, int16_t w, int16_t h,
+void raspiRA8875::drawRoundRect(int16_t x, int16_t y, int16_t w, int16_t h,
                                     int16_t r, uint16_t color) {
   roundRectHelper(x, y, x + w, y + h, r, color, false);
 }
 
-void Adafruit_RA8875::fillRoundRect(int16_t x, int16_t y, int16_t w, int16_t h,
+void raspiRA8875::fillRoundRect(int16_t x, int16_t y, int16_t w, int16_t h,
                                     int16_t r, uint16_t color) {
   roundRectHelper(x, y, x + w, y + h, r, color, true);
 }
 
-void Adafruit_RA8875::circleHelper(int16_t x, int16_t y, int16_t r,
+void raspiRA8875::circleHelper(int16_t x, int16_t y, int16_t r,
                                    uint16_t color, bool filled) {
   x = applyRotationX(x);
   y = applyRotationY(y);
@@ -423,7 +441,7 @@ void Adafruit_RA8875::circleHelper(int16_t x, int16_t y, int16_t r,
   waitPoll(RA8875_DCR, RA8875_DCR_CIRCLE_STATUS);
 }
 
-void Adafruit_RA8875::rectHelper(int16_t x, int16_t y, int16_t w, int16_t h,
+void raspiRA8875::rectHelper(int16_t x, int16_t y, int16_t w, int16_t h,
                                  uint16_t color, bool filled) {
   x = applyRotationX(x);
   y = applyRotationY(y);
@@ -475,7 +493,7 @@ void Adafruit_RA8875::rectHelper(int16_t x, int16_t y, int16_t w, int16_t h,
 }
 
 
-void Adafruit_RA8875::triangleHelper(int16_t x0, int16_t y0, int16_t x1,
+void raspiRA8875::triangleHelper(int16_t x0, int16_t y0, int16_t x1,
                                      int16_t y1, int16_t x2, int16_t y2,
                                      uint16_t color, bool filled) {
   x0 = applyRotationX(x0);
@@ -535,7 +553,7 @@ void Adafruit_RA8875::triangleHelper(int16_t x0, int16_t y0, int16_t x1,
   waitPoll(RA8875_DCR, RA8875_DCR_LINESQUTRI_STATUS);
 }
 
-void Adafruit_RA8875::ellipseHelper(int16_t xCenter, int16_t yCenter,
+void raspiRA8875::ellipseHelper(int16_t xCenter, int16_t yCenter,
                                     int16_t longAxis, int16_t shortAxis,
                                     uint16_t color, bool filled) {
   xCenter = applyRotationX(xCenter);
@@ -581,7 +599,7 @@ void Adafruit_RA8875::ellipseHelper(int16_t xCenter, int16_t yCenter,
   waitPoll(RA8875_ELLIPSE, RA8875_ELLIPSE_STATUS);
 }
 
-void Adafruit_RA8875::curveHelper(int16_t xCenter, int16_t yCenter,
+void raspiRA8875::curveHelper(int16_t xCenter, int16_t yCenter,
                                   int16_t longAxis, int16_t shortAxis,
                                   uint8_t curvePart, uint16_t color,
                                   bool filled) {
@@ -629,7 +647,7 @@ void Adafruit_RA8875::curveHelper(int16_t xCenter, int16_t yCenter,
   waitPoll(RA8875_ELLIPSE, RA8875_ELLIPSE_STATUS);
 }
 
-void Adafruit_RA8875::roundRectHelper(int16_t x, int16_t y, int16_t w,
+void raspiRA8875::roundRectHelper(int16_t x, int16_t y, int16_t w,
                                       int16_t h, int16_t r, uint16_t color,
                                       bool filled) {
   x = applyRotationX(x);
@@ -695,7 +713,7 @@ void Adafruit_RA8875::roundRectHelper(int16_t x, int16_t y, int16_t w,
   waitPoll(RA8875_ELLIPSE, RA8875_DCR_LINESQUTRI_STATUS);
 }
 
-void Adafruit_RA8875::setScrollWindow(int16_t x, int16_t y, int16_t w,
+void raspiRA8875::setScrollWindow(int16_t x, int16_t y, int16_t w,
                                       int16_t h, uint8_t mode) {
   // Horizontal Start point of Scroll Window
   writeCommand(0x38);
@@ -734,7 +752,7 @@ void Adafruit_RA8875::setScrollWindow(int16_t x, int16_t y, int16_t w,
 
  */
 /**************************************************************************/
-void Adafruit_RA8875::scrollX(int16_t dist) {
+void raspiRA8875::scrollX(int16_t dist) {
   writeCommand(0x24);
   writeData(dist);
   writeCommand(0x25);
@@ -749,7 +767,7 @@ void Adafruit_RA8875::scrollX(int16_t dist) {
 
  */
 /**************************************************************************/
-void Adafruit_RA8875::scrollY(int16_t dist) {
+void raspiRA8875::scrollY(int16_t dist) {
   writeCommand(0x26);
   writeData(dist);
   writeCommand(0x27);
@@ -766,7 +784,7 @@ void Adafruit_RA8875::scrollY(int16_t dist) {
 
  */
 /**************************************************************************/
-void Adafruit_RA8875::GPIOX(boolean on) {
+void raspiRA8875::GPIOX(bool on) {
   if (on)
     writeReg(RA8875_GPIOX, 1);
   else
@@ -780,7 +798,7 @@ void Adafruit_RA8875::GPIOX(boolean on) {
     @param p The duty Cycle (0-255)
 */
 /**************************************************************************/
-void Adafruit_RA8875::PWM1out(uint8_t p) { writeReg(RA8875_P1DCR, p); }
+void raspiRA8875::PWM1out(uint8_t p) { writeReg(RA8875_P1DCR, p); }
 
 /**************************************************************************/
 /*!
@@ -789,7 +807,7 @@ void Adafruit_RA8875::PWM1out(uint8_t p) { writeReg(RA8875_P1DCR, p); }
      @param p The duty Cycle (0-255)
 */
 /**************************************************************************/
-void Adafruit_RA8875::PWM2out(uint8_t p) { writeReg(RA8875_P2DCR, p); }
+void raspiRA8875::PWM2out(uint8_t p) { writeReg(RA8875_P2DCR, p); }
 
 /**************************************************************************/
 /*!
@@ -799,7 +817,7 @@ void Adafruit_RA8875::PWM2out(uint8_t p) { writeReg(RA8875_P2DCR, p); }
     @param clock The Clock Divider
 */
 /**************************************************************************/
-void Adafruit_RA8875::PWM1config(boolean on, uint8_t clock) {
+void raspiRA8875::PWM1config(bool on, uint8_t clock) {
   if (on) {
     writeReg(RA8875_P1CR, RA8875_P1CR_ENABLE | (clock & 0xF));
   } else {
@@ -807,7 +825,7 @@ void Adafruit_RA8875::PWM1config(boolean on, uint8_t clock) {
   }
 }
 
-void Adafruit_RA8875::PWM2config(boolean on, uint8_t clock) {
+void raspiRA8875::PWM2config(bool on, uint8_t clock) {
   if (on) {
     writeReg(RA8875_P2CR, RA8875_P2CR_ENABLE | (clock & 0xF));
   } else {
