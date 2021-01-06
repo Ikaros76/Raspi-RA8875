@@ -88,6 +88,16 @@ void raspiRA8875::waitBusy(uint8_t res) {
   } while ((temp & res) == res);
 }
 
+bool raspiRA8875::waitPoll(uint8_t regname, uint8_t waitflag) {
+  /* Wait for the command to finish */
+  while (1) {
+    uint8_t temp = readReg(regname);
+    if (!(temp & waitflag))
+      return true;
+  }
+  return false; // MEMEFIX: yeah i know, unreached! - add timeout?
+}
+
 bool raspiRA8875::displayBegin(enum RA8875sizes size) {
   _size = size;
   uint8_t pixclk;
@@ -261,6 +271,45 @@ bcm2835_spi_transfer(RA8875_DATAWRITE);
 bcm2835_spi_transfer(color >> 8);
 bcm2835_spi_transfer(color);
 bcm2835_gpio_write(_cs, HIGH);
+}
+
+void raspiRA8875::drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1,uint16_t color) {
+  x0 = applyRotationX(x0);
+  y0 = applyRotationY(y0);
+  x1 = applyRotationX(x1);
+  y1 = applyRotationY(y1);
+
+  writeCommand(0x91);
+  writeData(x0);
+  writeCommand(0x92);
+  writeData(x0 >> 8);
+
+  writeCommand(0x93);
+  writeData(y0);
+  writeCommand(0x94);
+  writeData(y0 >> 8);
+
+  writeCommand(0x95);
+  writeData(x1);
+  writeCommand(0x96);
+  writeData((x1) >> 8);
+
+  writeCommand(0x97);
+  writeData(y1);
+  writeCommand(0x98);
+  writeData((y1) >> 8);
+
+  writeCommand(0x63);
+  writeData((color & 0xf800) >> 11);
+  writeCommand(0x64);
+  writeData((color & 0x07e0) >> 5);
+  writeCommand(0x65);
+  writeData((color & 0x001f));
+
+  writeCommand(RA8875_DCR);
+  writeData(0x80);
+
+  waitPoll(RA8875_DCR, RA8875_DCR_LINESQUTRI_STATUS);
 }
 
 void raspiRA8875::clearMemory(bool stop) {
