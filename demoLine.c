@@ -34,7 +34,9 @@ int main(void) {
   int c = (rand() % 0xFFFF)+1;
   tft.drawLine(x0,y0,x1,y1,c);
   }
-  string pi = "Pi is " + to_string((tft.millis()-temps)/1000);
+  float p = (tft.millis()-temps)/1000;
+  printf("%f\n",p);
+  std::string pi = "Pi is " + std::to_string(p);
   int n = pi.length();
   char char_array[n+1];
   strcpy(char_array, pi.c_str());
