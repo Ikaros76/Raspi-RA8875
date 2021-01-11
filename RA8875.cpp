@@ -89,14 +89,13 @@ void raspiRA8875::waitBusy(uint8_t res) {
 }
 
 bool raspiRA8875::waitPoll(uint8_t regname, uint8_t waitflag) {
-  /* Wait for the command to finish */
   while (1) {
     writeCommand(regname);
     uint8_t temp = readData();
     if (!(temp & waitflag))
       return true;
   }
-  return false; // MEMEFIX: yeah i know, unreached! - add timeout?
+  return false;
 }
 
 int16_t raspiRA8875::applyRotationX(int16_t x) {
